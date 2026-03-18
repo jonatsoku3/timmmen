@@ -146,6 +146,30 @@ const FMAP={gasohol_95:['แก๊สโซฮอล์ 95'],gasohol_91:['แก
 let D=null,P=null,sel='gasohol_95',selR='ทั้งหมด',sq='',allOpen=false;
 const IV=60;let cd=IV;
 
+// === FALLBACK: ราคาจริง 18 มี.ค. 2569 (มีผล 05:00 น.) ===
+const FALLBACK={
+  date:'18 มีนาคม 2569',effective:'มีผล 18 มี.ค. 69 เวลา 05:00 น.',
+  stations:{
+    'ปตท. (PTT)':{c:'#2563eb',f:{'แก๊สโซฮอล์ 95':{p:32.05,ch:1.00},'แก๊สโซฮอล์ 91':{p:31.68,ch:1.00},'แก๊สโซฮอล์ E20':{p:27.05,ch:-0.79},'แก๊สโซฮอล์ E85':{p:23.79,ch:-2.00},'เบนซิน 95':{p:40.64,ch:1.00},'ดีเซล B7':{p:30.44,ch:0.50},'ดีเซลพรีเมี่ยม':{p:46.14,ch:0.50},'Super GSH 95':{p:41.04,ch:1.00}}},
+    'บางจาก (BCP)':{c:'#16a34a',f:{'แก๊สโซฮอล์ 95':{p:32.05,ch:1.00},'แก๊สโซฮอล์ 91':{p:31.68,ch:1.00},'แก๊สโซฮอล์ E20':{p:27.05,ch:-0.79},'แก๊สโซฮอล์ E85':{p:23.79,ch:-2.00},'Hi Premium 97':{p:49.54,ch:0},'ดีเซล B7':{p:30.44,ch:0.50},'ดีเซลพรีเมี่ยม':{p:46.14,ch:0.50}}},
+    'เชลล์ (Shell)':{c:'#dc2626',f:{'แก๊สโซฮอล์ 95':{p:33.35,ch:1.00},'แก๊สโซฮอล์ 91':{p:32.78,ch:1.00},'แก๊สโซฮอล์ E20':{p:28.15,ch:0},'ดีเซล B7':{p:30.44,ch:0.50},'V-Power GSH 95':{p:49.84,ch:0},'V-Power ดีเซล':{p:49.84,ch:0}}},
+    'เอสโซ่ (Esso)':{c:'#0ea5e9',f:{'แก๊สโซฮอล์ 95':{p:32.05,ch:1.00},'แก๊สโซฮอล์ 91':{p:31.68,ch:1.00},'แก๊สโซฮอล์ E20':{p:27.05,ch:-0.79},'ดีเซล B7':{p:30.44,ch:0.50},'ดีเซลพรีเมี่ยม':{p:46.14,ch:0.50}}},
+    'คาลเท็กซ์ (Caltex)':{c:'#e11d48',f:{'แก๊สโซฮอล์ 95':{p:32.05,ch:1.00},'แก๊สโซฮอล์ 91':{p:31.68,ch:1.00},'ดีเซล B7':{p:30.44,ch:0.50}}},
+    'PT Energy':{c:'#a855f7',f:{'แก๊สโซฮอล์ 95':{p:32.05,ch:1.00},'แก๊สโซฮอล์ 91':{p:31.68,ch:1.00},'แก๊สโซฮอล์ E20':{p:27.05,ch:-0.79},'เบนซิน 95':{p:41.14,ch:1.00},'ดีเซล B7':{p:30.44,ch:0.50}}}
+  },
+  base:{gsh95:32.05,gsh91:31.68,e20:27.05,e85:23.79,diesel:30.44,dpre:46.14,ben95:40.64},
+  provinces:{
+    'กลาง':{'กรุงเทพฯ':0,'นนทบุรี':0,'ปทุมธานี':0,'สมุทรปราการ':0,'สมุทรสาคร':.05,'นครปฐม':.08,'อยุธยา':.10,'อ่างทอง':.15,'ลพบุรี':.20,'สิงห์บุรี':.18,'ชัยนาท':.22,'สระบุรี':.15,'นครนายก':.18,'สุพรรณบุรี':.15,'กาญจนบุรี':.25,'ราชบุรี':.18,'เพชรบุรี':.22,'ประจวบฯ':.35,'สมุทรสงคราม':.12},
+    'เหนือ':{'เชียงใหม่':.65,'เชียงราย':.80,'ลำพูน':.62,'ลำปาง':.55,'แพร่':.58,'น่าน':.85,'พะเยา':.72,'แม่ฮ่องสอน':1.20,'อุตรดิตถ์':.45,'พิษณุโลก':.38,'สุโขทัย':.42,'ตาก':.60,'พิจิตร':.32,'เพชรบูรณ์':.40,'กำแพงเพชร':.38,'นครสวรรค์':.28,'อุทัยธานี':.30},
+    'อีสาน':{'นครราชสีมา':.25,'บุรีรัมย์':.35,'สุรินทร์':.40,'ศรีสะเกษ':.45,'อุบลราชธานี':.50,'ยโสธร':.48,'อำนาจเจริญ':.52,'ชัยภูมิ':.30,'ขอนแก่น':.38,'อุดรธานี':.48,'หนองคาย':.55,'เลย':.60,'หนองบัวลำภู':.50,'มหาสารคาม':.40,'ร้อยเอ็ด':.42,'กาฬสินธุ์':.45,'สกลนคร':.55,'นครพนม':.60,'มุกดาหาร':.55,'บึงกาฬ':.62},
+    'ตะวันออก':{'ชลบุรี':.10,'ระยอง':.05,'จันทบุรี':.30,'ตราด':.40,'ฉะเชิงเทรา':.08,'ปราจีนบุรี':.18,'สระแก้ว':.28},
+    'ใต้':{'ชุมพร':.45,'ระนอง':.55,'สุราษฎร์ธานี':.50,'นครศรีฯ':.60,'กระบี่':.65,'พังงา':.68,'ภูเก็ต':.72,'สงขลา':.70,'สตูล':.80,'ตรัง':.68,'พัทลุง':.65,'ปัตตานี':.78,'ยะลา':.85,'นราธิวาส':.90}
+  }
+};
+
+// Show fallback immediately
+D=FALLBACK;P=FALLBACK.provinces;
+
 // Clock
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})},1000);
 
@@ -160,6 +184,8 @@ setInterval(()=>{
 // Fetch
 async function load(){
   cd=IV;
+  // Always render what we have immediately
+  if(D)render();
   document.getElementById('status').textContent='อัปเดต...';
   try{
     const r=await fetch('/api/prices');const j=await r.json();
@@ -169,8 +195,14 @@ async function load(){
     document.getElementById('status').textContent='✓ '+t;
     render();
   }catch(e){
-    document.getElementById('status').textContent='ผิดพลาด';
-    if(!D)document.getElementById('app').innerHTML='<div class="loading"><div style="color:#f87171;font-size:.85rem;text-align:center;line-height:1.6">เชื่อมต่อ server ไม่ได้<br><span style="font-size:.7rem;color:var(--t3)">ตรวจสอบว่ารัน npm start แล้ว</span></div></div>';
+    // Keep showing fallback data — don't show error if we have data
+    if(D){
+      document.getElementById('status').textContent='✓ ออฟไลน์';
+      render();
+    }else{
+      document.getElementById('status').textContent='ผิดพลาด';
+      document.getElementById('app').innerHTML='<div class="loading"><div style="color:#f87171;font-size:.85rem;text-align:center;line-height:1.6">เชื่อมต่อ server ไม่ได้</div></div>';
+    }
   }
 }
 
@@ -193,6 +225,14 @@ function render(){
     h+=`<button class="ft ${fu.id===sel?'on':''}" onclick="pick('${fu.id}')">${fu.short}${p?`<span class="price">${p.toFixed(2)}</span>`:''}</button>`;
   }
   h+='</div>';
+
+  // === DATE BAR ===
+  const now=new Date();
+  const thaiDate=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;padding:.5rem .7rem;background:var(--card);border-radius:8px;font-size:.68rem">
+    <span style="color:var(--t2)">📅 ${thaiDate}</span>
+    <span style="font-family:'Space Mono';color:var(--am);font-weight:700;font-size:.62rem">${D.date||''}</span>
+  </div>`;
 
   // === COMPARE ===
   const cmp=[];

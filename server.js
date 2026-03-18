@@ -206,6 +206,48 @@ function findPrice(fuels, keyword) {
   return null;
 }
 
+// ==================== FALLBACK DATA 18 มี.ค. 2569 ====================
+const FALLBACK_DATA = {
+  date: '18 มีนาคม 2569', effective: 'มีผล 18 มี.ค. 69 เวลา 05:00 น.',
+  stations: {
+    'ปตท. (PTT)': { c: '#2563eb', f: {
+      'แก๊สโซฮอล์ 95': { p: 32.05, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 31.68, ch: 1.00 },
+      'แก๊สโซฮอล์ E20': { p: 27.05, ch: -0.79 }, 'แก๊สโซฮอล์ E85': { p: 23.79, ch: -2.00 },
+      'เบนซิน 95': { p: 40.64, ch: 1.00 }, 'Super GSH 95': { p: 41.04, ch: 1.00 },
+      'ดีเซล B7': { p: 30.44, ch: 0.50 }, 'ดีเซลพรีเมี่ยม': { p: 43.94, ch: 0.50 }
+    }},
+    'บางจาก (BCP)': { c: '#16a34a', f: {
+      'แก๊สโซฮอล์ 95': { p: 32.05, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 31.68, ch: 1.00 },
+      'แก๊สโซฮอล์ E20': { p: 27.05, ch: -0.79 }, 'แก๊สโซฮอล์ E85': { p: 23.79, ch: -2.00 },
+      'Hi Premium 97': { p: 49.54, ch: 0 }, 'Hi Diesel S': { p: 30.44, ch: 0.50 },
+      'Hi Premium Diesel S': { p: 46.14, ch: 0.50 }
+    }},
+    'เชลล์ (Shell)': { c: '#dc2626', f: {
+      'แก๊สโซฮอล์ 95': { p: 33.35, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 32.78, ch: 1.00 },
+      'แก๊สโซฮอล์ E20': { p: 28.15, ch: -0.79 },
+      'V-Power GSH 95': { p: 49.84, ch: 0 }, 'ดีเซล': { p: 30.44, ch: 0.50 },
+      'V-Power ดีเซล': { p: 49.84, ch: 0 }
+    }},
+    'เอสโซ่ (Esso)': { c: '#0ea5e9', f: {
+      'แก๊สโซฮอล์ 95': { p: 32.05, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 31.68, ch: 1.00 },
+      'แก๊สโซฮอล์ E20': { p: 27.05, ch: -0.79 },
+      'ดีเซล': { p: 30.44, ch: 0.50 }, 'ดีเซลพรีเมี่ยม': { p: 46.14, ch: 0.50 }
+    }},
+    'คาลเท็กซ์ (Caltex)': { c: '#e11d48', f: {
+      'แก๊สโซฮอล์ 95': { p: 32.05, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 31.68, ch: 1.00 },
+      'ดีเซล': { p: 30.44, ch: 0.50 }
+    }},
+    'PT Energy': { c: '#a855f7', f: {
+      'แก๊สโซฮอล์ 95': { p: 32.05, ch: 1.00 }, 'แก๊สโซฮอล์ 91': { p: 31.68, ch: 1.00 },
+      'แก๊สโซฮอล์ E20': { p: 27.05, ch: -0.79 },
+      'เบนซิน 95': { p: 41.14, ch: 1.00 }, 'ดีเซล': { p: 30.44, ch: 0.50 }
+    }}
+  },
+  base: { gsh95: 32.05, gsh91: 31.68, e20: 27.05, e85: 23.79, diesel: 30.44, dpre: 43.94, ben95: 40.64 },
+  provinces: PROVINCES,
+  fetchedAt: '2026-03-18T05:00:00Z'
+};
+
 // ==================== API ROUTES ====================
 app.get('/api/prices', async (req, res) => {
   try {
@@ -213,11 +255,12 @@ app.get('/api/prices', async (req, res) => {
     res.json({ status: 'success', data });
   } catch (e) {
     console.error('[API ERROR]', e.message);
-    // Return cache even if stale
+    // Return cache if available, otherwise fallback
     if (cache.data) {
       res.json({ status: 'success', data: cache.data, stale: true });
     } else {
-      res.status(500).json({ status: 'error', message: e.message });
+      console.log('[API] Using fallback data');
+      res.json({ status: 'success', data: FALLBACK_DATA, stale: true });
     }
   }
 });
